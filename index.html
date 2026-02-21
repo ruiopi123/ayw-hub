@@ -2,13 +2,122 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Ayw-Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayw-Hub | The Package Manager for Aywsion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <script>
+        // Tailwindのカスタム設定（Aywsionのアクセントカラー）
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ayw: '#00f2ff', // ゲーミングネオンブルー
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: white; }
-        h1 { color: #333; border-bottom: 2px solid #00f2ff; }
+        /* 全体のフォントをモダンに */
+        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #fafafa; }
     </style>
 </head>
-<body>
-    <h1>Ayw-Hub: Starting Soon...</h1>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-black rounded flex justify-center items-center">
+                    <span class="text-ayw font-bold text-lg">A</span>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">Ayw-Hub<span class="text-gray-400 font-normal text-sm ml-1">.space</span></h1>
+            </div>
+            <div class="text-sm font-medium text-gray-500">
+                <a href="#" class="hover:text-black transition">Libraries</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-5xl mx-auto w-full px-6 py-12">
+        <div class="mb-10 text-center">
+            <h2 class="text-3xl font-extrabold mb-4">Discover Aywsion Packages</h2>
+            <p class="text-gray-500">1日で習得、3日で応用。あなたのOSを拡張するライブラリを見つけよう。</p>
+        </div>
+
+        <div id="library-list" class="space-y-4">
+            <div class="text-center text-gray-400 py-10 animate-pulse">
+                Fetching libraries from database...
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 py-8 text-center text-gray-400 text-sm">
+        <p>&copy; 2026 Aywsion Team. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // ⚠️ 注意：以下の2行を、あなたのSupabase情報に書き換えてください！
+        // ==========================================
+        const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
+
+        // Supabaseの準備
+        const { createClient } = supabase;
+        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // データを取得して画面に表示する関数
+        async function loadLibraries() {
+            const listContainer = document.getElementById('library-list');
+
+            try {
+                // 1. データベースからA-Z順に取得
+                const { data, error } = await db
+                    .from('libraries')
+                    .select('*')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+
+                // 2. 画面を一旦クリア
+                listContainer.innerHTML = '';
+
+                if (data.length === 0) {
+                    listContainer.innerHTML = '<div class="text-center text-gray-500 py-10">No libraries found yet.</div>';
+                    return;
+                }
+
+                // 3. 取得したデータをループして「カード」を作成
+                data.forEach(lib => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between sm:items-center gap-4 group";
+                    
+                    card.innerHTML = `
+                        <div>
+                            <div class="flex items-center gap-3 mb-1">
+                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">${lib.name}</h3>
+                                <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-mono">v${lib.version}</span>
+                            </div>
+                            <p class="text-gray-500 text-sm mb-2">${lib.description}</p>
+                            <p class="text-xs text-gray-400">By ${lib.author}</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+                            <code class="text-sm font-mono text-gray-700 select-all">ayw install ${lib.name}</code>
+                        </div>
+                    `;
+                    listContainer.appendChild(card);
+                });
+
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                listContainer.innerHTML = '<div class="text-center text-red-500 py-10">Failed to load libraries. Please check console.</div>';
+            }
+        }
+
+        // ページが読み込まれたら実行
+        window.addEventListener('DOMContentLoaded', loadLibraries);
+    </script>
 </body>
 </html>

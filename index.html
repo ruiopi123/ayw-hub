@@ -1,123 +1,164 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayw-Hub | The Package Manager for Aywsion</title>
+    <title>Ayw-Hub | The Pure Library Space</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <script>
-        // Tailwindのカスタム設定（Aywsionのアクセントカラー）
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        ayw: '#00f2ff', // ゲーミングネオンブルー
-                    }
+                    colors: { ayw: '#00f2ff' },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
     <style>
-        /* 全体のフォントをモダンに */
-        body { font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #fafafa; }
+        body { background-color: #ffffff; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        .card-hover:hover { transform: translateY(-2px); border-color: #00f2ff; }
+        /* スクロールバーのカスタマイズ */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ccc; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-slate-900 antialiased">
 
-    <header class="bg-white border-b border-gray-100 sticky top-0 z-10">
-        <div class="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-black rounded flex justify-center items-center">
-                    <span class="text-ayw font-bold text-lg">A</span>
+    <header class="glass border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 bg-slate-900 rounded flex items-center justify-center">
+                    <span class="text-ayw font-black text-xs">A</span>
                 </div>
-                <h1 class="text-xl font-bold tracking-tight">Ayw-Hub<span class="text-gray-400 font-normal text-sm ml-1">.space</span></h1>
+                <span class="font-extrabold tracking-tighter text-xl">Ayw-Hub<span class="text-slate-300 font-light">.space</span></span>
             </div>
-            <div class="text-sm font-medium text-gray-500">
-                <a href="#" class="hover:text-black transition">Libraries</a>
-            </div>
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-slate-500">
+                <a href="#" class="text-slate-900">Explorer</a>
+                <a href="https://github.com" class="hover:text-slate-900 transition">Docs</a>
+                <a href="https://github.com" class="hover:text-slate-900 transition">GitHub</a>
+            </nav>
         </div>
     </header>
 
-    <main class="flex-grow max-w-5xl mx-auto w-full px-6 py-12">
-        <div class="mb-10 text-center">
-            <h2 class="text-3xl font-extrabold mb-4">Discover Aywsion Packages</h2>
-            <p class="text-gray-500">1日で習得、3日で応用。あなたのOSを拡張するライブラリを見つけよう。</p>
-        </div>
-
-        <div id="library-list" class="space-y-4">
-            <div class="text-center text-gray-400 py-10 animate-pulse">
-                Fetching libraries from database...
+    <section class="py-20 border-b border-slate-50">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-5xl font-extrabold tracking-tight mb-6 italic">Pure & Logic.</h2>
+            <p class="text-lg text-slate-500 mb-10 max-w-2xl mx-auto">
+                The official package registry for Aywsion. <br>
+                Clean, modern, and high-performance libraries only.
+            </p>
+            
+            <div class="relative max-w-xl mx-auto">
+                <input type="text" id="search-input" 
+                    placeholder="Search libraries (e.g. 'neon', 'math')..." 
+                    class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-ayw/50 focus:bg-white transition-all text-lg">
+                <svg class="w-6 h-6 text-slate-400 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
+        </div>
+    </section>
+
+    <div class="bg-white sticky top-16 z-40 border-b border-slate-50 overflow-x-auto">
+        <div class="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+            <div id="alphabet-nav" class="flex gap-4"></div>
+        </div>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        <div id="library-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="animate-pulse bg-slate-50 h-40 rounded-2xl"></div>
+            <div class="animate-pulse bg-slate-50 h-40 rounded-2xl"></div>
+            <div class="animate-pulse bg-slate-50 h-40 rounded-2xl"></div>
         </div>
     </main>
 
-    <footer class="bg-white border-t border-gray-100 py-8 text-center text-gray-400 text-sm">
-        <p>&copy; 2026 Aywsion Team. All rights reserved.</p>
+    <footer class="py-20 border-t border-slate-50 text-center">
+        <p class="text-slate-400 text-sm italic">Designed for the next generation OS.</p>
     </footer>
 
     <script>
-        // ==========================================
-        // ⚠️ 注意：以下の2行を、あなたのSupabase情報に書き換えてください！
-        // ==========================================
+        // --- 設定 ---
         const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
-
-        // Supabaseの準備
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
         const { createClient } = supabase;
-        const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // データを取得して画面に表示する関数
-        async function loadLibraries() {
-            const listContainer = document.getElementById('library-list');
+        let allLibraries = [];
 
-            try {
-                // 1. データベースからA-Z順に取得
-                const { data, error } = await db
-                    .from('libraries')
-                    .select('*')
-                    .order('name', { ascending: true });
+        // --- A-Z ナビ生成 ---
+        const nav = document.getElementById('alphabet-nav');
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(char => {
+            const span = document.createElement('span');
+            span.textContent = char;
+            span.className = "cursor-pointer hover:text-ayw transition hover:scale-125";
+            span.onclick = () => filterByLetter(char);
+            nav.appendChild(span);
+        });
 
-                if (error) throw error;
-
-                // 2. 画面を一旦クリア
-                listContainer.innerHTML = '';
-
-                if (data.length === 0) {
-                    listContainer.innerHTML = '<div class="text-center text-gray-500 py-10">No libraries found yet.</div>';
-                    return;
-                }
-
-                // 3. 取得したデータをループして「カード」を作成
-                data.forEach(lib => {
-                    const card = document.createElement('div');
-                    card.className = "bg-white border border-gray-100 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row justify-between sm:items-center gap-4 group";
-                    
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">${lib.name}</h3>
-                                <span class="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full font-mono">v${lib.version}</span>
-                            </div>
-                            <p class="text-gray-500 text-sm mb-2">${lib.description}</p>
-                            <p class="text-xs text-gray-400">By ${lib.author}</p>
-                        </div>
-                        <div class="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
-                            <code class="text-sm font-mono text-gray-700 select-all">ayw install ${lib.name}</code>
-                        </div>
-                    `;
-                    listContainer.appendChild(card);
-                });
-
-            } catch (err) {
-                console.error("Error fetching data:", err);
-                listContainer.innerHTML = '<div class="text-center text-red-500 py-10">Failed to load libraries. Please check console.</div>';
-            }
+        // --- データ取得 ---
+        async function init() {
+            const { data, error } = await db.from('libraries').select('*').order('name', { ascending: true });
+            if (error) return console.error(error);
+            allLibraries = data;
+            render(allLibraries);
         }
 
-        // ページが読み込まれたら実行
-        window.addEventListener('DOMContentLoaded', loadLibraries);
+        // --- 描画ロジック ---
+        function render(libs) {
+            const container = document.getElementById('library-container');
+            container.innerHTML = '';
+
+            if (libs.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-20 text-center text-slate-400">No libraries match your search.</div>`;
+                return;
+            }
+
+            libs.forEach(lib => {
+                const card = document.createElement('div');
+                card.className = "group p-6 bg-white border border-slate-100 rounded-2xl shadow-sm card-hover transition-all flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold tracking-tight group-hover:text-ayw transition-colors">${lib.name}</h3>
+                            <span class="text-[10px] font-mono bg-slate-900 text-white px-2 py-0.5 rounded uppercase">v${lib.version}</span>
+                        </div>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-2">${lib.description}</p>
+                    </div>
+                    <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-50">
+                        <span class="text-xs text-slate-400 font-medium">by ${lib.author}</span>
+                        <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                            <code class="text-[10px] font-mono text-slate-600">ayw install ${lib.name}</code>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- 検索機能 ---
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allLibraries.filter(l => 
+                l.name.toLowerCase().includes(term) || 
+                l.description.toLowerCase().includes(term)
+            );
+            render(filtered);
+        });
+
+        // --- 文字フィルター ---
+        function filterByLetter(char) {
+            const filtered = allLibraries.filter(l => l.name.toUpperCase().startsWith(char));
+            render(filtered);
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+
+        init();
     </script>
 </body>
 </html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publish | Ayw-Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { ayw: '#00f2ff' }, fontFamily: { sans: ['Inter', 'Noto Sans JP', 'sans-serif'] } } } }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
+
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
+            <a href="index.html" class="font-black text-xl tracking-tighter flex items-center gap-2">
+                <div class="w-6 h-6 bg-slate-900 rounded flex items-center justify-center"><span class="text-ayw text-[10px]">A</span></div>
+                Ayw-Hub
+            </a>
+            <nav class="text-sm font-bold text-slate-500 flex gap-6">
+                <a href="index.html" class="hover:text-slate-900">Explorer</a>
+                <a href="publish.html" class="text-slate-900 border-b-2 border-ayw">Publish</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-2xl mx-auto px-6 py-16">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
+            <h2 class="text-3xl font-black mb-2">ライブラリを公開</h2>
+            <p class="text-slate-400 mb-10 font-medium">新しい力を Aywsion エコシステムへ提供しましょう。</p>
+
+            <form id="publish-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">ライブラリ名 (A-Z, 0-9, - のみ)</label>
+                    <input type="text" id="name" required pattern="^[a-z0-9-]+$" 
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-ayw/20 focus:border-ayw outline-none transition-all font-mono"
+                        placeholder="my-awesome-lib">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">バージョン</label>
+                        <input type="text" id="version" required placeholder="1.0.0" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">作者</label>
+                        <input type="text" id="author" required placeholder="Your Name" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">ダウンロードURL (.aywファイル等)</label>
+                    <input type="url" id="url" required placeholder="https://..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none font-mono text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">説明文 (日本語OK)</label>
+                    <textarea id="desc" rows="3" required placeholder="このライブラリは何をしますか？" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none"></textarea>
+                </div>
+                
+                <button type="submit" id="submit-btn" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:bg-slate-800 hover:shadow-lg transition-all active:scale-95">
+                    ライブラリを登録する
+                </button>
+            </form>
+            <div id="message" class="mt-6 text-center font-bold hidden"></div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        document.getElementById('publish-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const msg = document.getElementById('message');
+            btn.disabled = true;
+            btn.textContent = '登録中...';
+
+            const payload = {
+                name: document.getElementById('name').value.toLowerCase(),
+                version: document.getElementById('version').value,
+                author: document.getElementById('author').value,
+                download_url: document.getElementById('url').value,
+                description: document.getElementById('desc').value
+            };
+
+            const { error } = await db.from('libraries').insert([payload]);
+
+            if (error) {
+                msg.textContent = 'エラー: ' + error.message;
+                msg.className = 'mt-6 text-center font-bold text-red-500 block';
+            } else {
+                msg.textContent = '登録が完了しました！Explorerを確認してください。';
+                msg.className = 'mt-6 text-center font-bold text-green-500 block';
+                document.getElementById('publish-form').reset();
+            }
+            btn.disabled = false;
+            btn.textContent = 'ライブラリを登録する';
+        });
+    </script>
+</body>
+</html>

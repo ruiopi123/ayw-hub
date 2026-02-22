@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Aywsion - プログラミングを、もっと自由に。</title>
+    <style>
+        :root {
+            --primary-color: #c9ff00; /* ロゴに使われていたライムグリーン */
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #ffffff;
+            --accent-glow: rgba(201, 255, 0, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #30363d;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #8b949e;
+        }
+
+        .download-box {
+            padding: 30px;
+            border: 2px dashed #30363d;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: #000;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px var(--primary-color);
+            background-color: #dfff4f;
+        }
+
+        .info {
+            font-size: 0.9rem;
+            color: #8b949e;
+            margin-top: 15px;
+        }
+
+        .steps {
+            text-align: left;
+            margin-top: 40px;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+
+        .steps h3 {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        code {
+            background: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ff79c6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">Ayw</div>
+    <h1>The Next Generation Language</h1>
+
+    <div class="download-box">
+        <p>最新バージョン: <strong>v1.0.0 (Genesis Core)</strong></p>
+        <a href="https://github.com/ruiopi123/ayw-hub/releases/download/aywsion/Aywsion_Setup_v1.0.exe" class="btn">
+            Download for Windows
+        </a>
+        <p class="info">Windows 10 / 11 (64-bit) 対応</p>
+    </div>
+
+    <div class="steps">
+        <h3>🚀 クイックスタート</h3>
+        <ol>
+            <li>インストーラーを実行し、利用規約に同意します。</li>
+            <li>インストール完了後、新しいターミナルを開きます。</li>
+            <li><code>ayw</code> と入力して、Aywsion のロゴが表示されれば完了です！</li>
+        </ol>
+    </div>
+
+    <footer style="margin-top: 40px; font-size: 0.8rem; color: #484f58;">
+        &copy; 2026 Aywsion Project. All rights reserved.
+    </footer>
+</div>
+
+</body>
+</html>

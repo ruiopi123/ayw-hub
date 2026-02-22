@@ -13,24 +13,28 @@
     <style>
         .drop-zone { border: 2px dashed #e2e8f0; transition: all 0.3s; }
         .drop-zone:hover { border-color: #00f2ff; background: #f0fdfa; }
+        .hidden-until-auth { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
 
     <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center">
-            <a href="index.html" class="font-black text-xl tracking-tighter flex items-center gap-2 text-slate-900">
-                <div class="w-6 h-6 bg-slate-900 rounded flex items-center justify-center"><span class="text-ayw text-[10px]">A</span></div>
-                Ayw-Hub
-            </a>
-            <nav class="text-sm font-bold text-slate-500 flex gap-6 italic">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="font-black text-xl tracking-tighter flex items-center gap-2 text-slate-900">
+                    <div class="w-6 h-6 bg-slate-900 rounded flex items-center justify-center"><span class="text-ayw text-[10px]">A</span></div>
+                    Ayw-Hub
+                </a>
+            </div>
+            <nav class="text-sm font-bold text-slate-500 flex gap-6 italic items-center">
                 <a href="index.html" class="hover:text-slate-900">Explorer</a>
                 <a href="publish.html" class="text-slate-900 border-b-2 border-ayw">Publish</a>
+                <button onclick="handleLogout()" class="text-[10px] text-slate-300 hover:text-red-400 transition">LOGOUT</button>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 py-16">
+    <main class="max-w-2xl mx-auto px-6 py-16 hidden-until-auth" id="main-content">
         <div class="bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/50 border border-slate-100">
             <h2 class="text-3xl font-black mb-2 italic">Deploy your Logic.</h2>
             <p class="text-slate-400 mb-10 font-medium text-sm">ZIP形式のライブラリを直接アップロードできます。</p>
@@ -49,8 +53,8 @@
                         <input type="text" id="version" required placeholder="1.0.0" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Author</label>
-                        <input type="text" id="author" required placeholder="Your Name" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold">
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Display Author Name</label>
+                        <input type="text" id="author" required placeholder="Your Display Name" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-bold">
                     </div>
                 </div>
 
@@ -83,6 +87,23 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // --- ログイン状態の確認 ---
+        async function checkAuth() {
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) {
+                // ログインしていない場合はログイン画面へ
+                location.href = 'login.html';
+            } else {
+                // ログインしていればコンテンツを表示
+                document.getElementById('main-content').classList.remove('hidden-until-auth');
+            }
+        }
+
+        async function handleLogout() {
+            await db.auth.signOut();
+            location.href = 'index.html';
+        }
+
         // ファイル名表示の切り替え
         document.getElementById('file-input').addEventListener('change', (e) => {
             const fileName = e.target.files[0]?.name;
@@ -98,14 +119,18 @@
             const msg = document.getElementById('message');
             const file = document.getElementById('file-input').files[0];
             
+            // ユーザー情報を取得
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) return alert("セッションが切れました。再ログインしてください。");
+
             btn.disabled = true;
             btn.textContent = 'Uploading...';
             msg.className = 'mt-8 text-center text-sm font-bold block text-slate-500 animate-pulse';
-            msg.textContent = 'ファイルを転送中...';
+            msg.textContent = 'セキュアな転送を開始中...';
 
             try {
                 const libName = document.getElementById('name').value.toLowerCase();
-                const filePath = `${libName}-${Date.now()}.zip`;
+                const filePath = `${user.id}/${libName}-${Date.now()}.zip`; // ユーザーIDをパスに含めて整理
 
                 // 1. Storageにアップロード
                 const { data: uploadData, error: uploadError } = await db.storage
@@ -118,18 +143,19 @@
                 const { data: urlData } = db.storage.from('packages').getPublicUrl(filePath);
                 const publicUrl = urlData.publicUrl;
 
-                // 3. データベースに情報を登録
+                // 3. データベースに情報を登録（user_idを追加！）
                 const { error: dbError } = await db.from('libraries').insert([{
                     name: libName,
                     version: document.getElementById('version').value,
                     author: document.getElementById('author').value,
                     download_url: publicUrl,
-                    description: document.getElementById('desc').value
+                    description: document.getElementById('desc').value,
+                    user_id: user.id // ここがポイント！
                 }]);
 
                 if (dbError) throw dbError;
 
-                msg.textContent = '🎉 公開に成功しました！Explorerを確認してください。';
+                msg.textContent = '🎉 公開に成功しました！あなたのライブラリが世界へ届きました。';
                 msg.className = 'mt-8 text-center text-sm font-bold block text-green-500';
                 document.getElementById('publish-form').reset();
                 document.getElementById('file-label').innerHTML = 'ここにZIPファイルをドラッグ＆ドロップ';
@@ -142,6 +168,8 @@
                 btn.textContent = 'アップロードして公開';
             }
         });
+
+        checkAuth();
     </script>
 </body>
 </html>

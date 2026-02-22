@@ -10,6 +10,9 @@
     <script>
         tailwind.config = { theme: { extend: { colors: { ayw: '#00f2ff' }, fontFamily: { sans: ['Inter', 'Noto Sans JP', 'sans-serif'] } } } }
     </script>
+    <style>
+        .hidden-until-auth { display: none; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased min-h-screen">
 
@@ -17,23 +20,25 @@
         <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
             <a href="index.html" class="font-black text-xl tracking-tighter flex items-center gap-2">
                 <div class="w-6 h-6 bg-slate-900 rounded flex items-center justify-center"><span class="text-ayw text-[10px]">A</span></div>
-                Ayw-Hub <span class="text-slate-400 font-normal text-xs ml-2">Admin</span>
+                Ayw-Hub <span class="text-slate-400 font-normal text-xs ml-2">My Packages</span>
             </a>
-            <nav class="text-sm font-bold text-slate-500 flex gap-6">
+            <nav class="text-sm font-bold text-slate-500 flex gap-6 italic items-center">
                 <a href="index.html" class="hover:text-slate-900 transition">Explorer</a>
+                <a href="publish.html" class="hover:text-slate-900 transition">Publish</a>
                 <a href="admin.html" class="text-slate-900 border-b-2 border-slate-900">Management</a>
+                <button onclick="handleLogout()" class="text-[10px] text-slate-300 hover:text-red-400 transition ml-4 uppercase">Logout</button>
             </nav>
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 py-12">
+    <main id="main-content" class="max-w-6xl mx-auto px-6 py-12 hidden-until-auth">
         <div class="mb-10 flex justify-between items-end">
             <div>
-                <h2 class="text-3xl font-black italic mb-2">Library Control</h2>
-                <p class="text-slate-500 font-medium text-sm">登録済みライブラリの編集と削除を行います。</p>
+                <h2 class="text-3xl font-black italic mb-2">Package Control</h2>
+                <p class="text-slate-500 font-medium text-sm">あなたが投稿したライブラリの管理を行います。</p>
             </div>
-            <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-400">
-                TOTAL: <span id="total-count" class="text-slate-900">0</span>
+            <div class="bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-400 shadow-sm">
+                YOUR PACKAGES: <span id="total-count" class="text-slate-900">0</span>
             </div>
         </div>
 
@@ -42,69 +47,97 @@
                 <thead>
                     <tr class="bg-slate-900 text-white text-[11px] uppercase tracking-widest font-black">
                         <th class="px-8 py-5">Library Name</th>
-                        <th class="px-8 py-5">Ver</th>
-                        <th class="px-8 py-5">Author</th>
+                        <th class="px-8 py-5">Version</th>
+                        <th class="px-8 py-5">Author Name</th>
                         <th class="px-8 py-5 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="admin-list" class="divide-y divide-slate-50">
                     </tbody>
             </table>
+            <div id="empty-state" class="hidden py-20 text-center text-slate-400 font-bold">
+                まだ投稿されたパッケージはありません。
+            </div>
         </div>
     </main>
 
     <script>
-        // --- 設定 (ここを書き換えてください) ---
         const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
-        const ADMIN_PASSWORD = 'ayw'; // ← あなたが使う管理用パスワード
-
+        
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        async function fetchAdminList() {
-            const { data, error } = await db.from('libraries').select('*').order('name', { ascending: true });
+        // --- 認証チェック ---
+        async function checkAuth() {
+            const { data: { user } } = await db.auth.getUser();
+            if (!user) {
+                location.href = 'login.html';
+            } else {
+                document.getElementById('main-content').classList.remove('hidden-until-auth');
+                fetchMyPackages(user.id);
+            }
+        }
+
+        async function handleLogout() {
+            await db.auth.signOut();
+            location.href = 'index.html';
+        }
+
+        // --- 自分のパッケージのみ取得 ---
+        async function fetchMyPackages(userId) {
+            const { data, error } = await db
+                .from('libraries')
+                .select('*')
+                .eq('user_id', userId) // 自分のIDに一致するものだけ
+                .order('created_at', { ascending: false });
+
             if (error) return alert('エラー: ' + error.message);
             
             const container = document.getElementById('admin-list');
+            const emptyState = document.getElementById('empty-state');
             document.getElementById('total-count').textContent = data.length;
             container.innerHTML = '';
 
+            if (data.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
             data.forEach(lib => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50/50 transition-colors group";
                 tr.innerHTML = `
                     <td class="px-8 py-6">
                         <div class="font-bold text-slate-900 group-hover:text-ayw transition-colors">${lib.name}</div>
-                        <div class="text-[10px] text-slate-400 mt-1 truncate max-w-[200px]">${lib.description}</div>
+                        <div class="text-[10px] text-slate-400 mt-1 truncate max-w-[200px]">${lib.description || 'No description'}</div>
                     </td>
                     <td class="px-8 py-6 font-mono text-xs text-slate-500">v${lib.version}</td>
-                    <td class="px-8 py-6 text-sm text-slate-600">${lib.author}</td>
+                    <td class="px-8 py-6 text-sm text-slate-600 font-medium">${lib.author}</td>
                     <td class="px-8 py-6 text-right space-x-2">
-                        <button onclick="deleteLib('${lib.id}', '${lib.name}')" class="text-[11px] font-black text-red-400 hover:text-red-600 uppercase tracking-tighter transition">Delete</button>
+                        <button onclick="deleteLib('${lib.id}', '${lib.name}')" class="px-4 py-2 bg-red-50 text-[11px] font-black text-red-500 hover:bg-red-500 hover:text-white rounded-lg uppercase tracking-tighter transition-all">Delete</button>
                     </td>
                 `;
                 container.appendChild(tr);
             });
         }
 
-        // --- 削除機能 ---
+        // --- 削除機能 (RLSにより自分以外は削除不可) ---
         async function deleteLib(id, name) {
-            const pass = prompt(`ライブラリ「${name}」を削除しますか？\n削除するには管理パスワードを入力してください：`);
-            
-            if (pass === ADMIN_PASSWORD) {
+            if (confirm(`ライブラリ「${name}」を完全に削除しますか？\nこの操作は取り消せません。`)) {
                 const { error } = await db.from('libraries').delete().eq('id', id);
+                
                 if (error) {
-                    alert('削除に失敗しました: ' + error.message);
+                    alert('削除権限がないか、エラーが発生しました: ' + error.message);
                 } else {
-                    alert('削除しました。');
-                    fetchAdminList();
+                    alert('削除が完了しました。');
+                    const { data: { user } } = await db.auth.getUser();
+                    fetchMyPackages(user.id);
                 }
-            } else if (pass !== null) {
-                alert('パスワードが違います。');
             }
         }
 
-        fetchAdminList();
+        checkAuth();
     </script>
 </body>
 </html>

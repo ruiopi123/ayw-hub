@@ -41,7 +41,11 @@
                 <a href="index.html" class="font-black tracking-tighter text-xl">Ayw-Hub<span class="text-slate-300 font-light ml-0.5">.space</span></a>
             </div>
             
-            <nav class="hidden md:flex gap-8 text-sm font-bold text-slate-500">
+            <nav class="hidden md:flex gap-8 text-sm font-bold text-slate-500 items-center">
+                <a href="download.html" class="bg-slate-900 text-ayw px-4 py-2 rounded-full hover:bg-slate-800 transition shadow-lg shadow-slate-200 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Ayw を入手
+                </a>
                 <a href="index.html" class="text-slate-900 border-b-2 border-ayw pb-1">ライブラリ</a>
                 <a href="publish.html" class="hover:text-slate-900 transition">投稿する</a>
                 <a href="docs.html" class="hover:text-slate-900 transition">使い方</a>
@@ -53,10 +57,17 @@
     <section class="py-24 bg-gradient-to-b from-white to-slate-50/50 border-b border-slate-50">
         <div class="max-w-4xl mx-auto px-6 text-center">
             <h2 class="text-5xl md:text-6xl font-black tracking-tight mb-6 italic text-slate-900">Pure & Logic.</h2>
-            <p class="text-lg text-slate-500 mb-12 leading-relaxed">
+            <p class="text-lg text-slate-500 mb-8 leading-relaxed">
                 Aywsion 専用の公式パッケージレジストリ。<br class="hidden md:block">
                 軽量・高速・シンプル。厳選されたライブラリをあなたのOSへ。
             </p>
+
+            <div class="mb-12">
+                <a href="download.html" class="text-sm font-bold text-slate-400 hover:text-ayw transition flex items-center justify-center gap-1 group">
+                    <span>Aywsion 言語本体をお探しですか？</span>
+                    <span class="underline decoration-ayw decoration-2 underline-offset-4 text-slate-900 group-hover:text-ayw transition-colors">ダウンロードページへ →</span>
+                </a>
+            </div>
             
             <div class="relative max-w-2xl mx-auto group">
                 <input type="text" id="search-input" 
@@ -111,7 +122,7 @@
     </footer>
 
     <script>
-        // --- 設定 (ここを書き換えてください) ---
+        // --- 設定 (Supabase の情報は以前のものを保持) ---
         const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
         
@@ -130,7 +141,6 @@
             nav.appendChild(span);
         });
 
-        // --- データ初期取得 ---
         async function init() {
             const { data, error } = await db.from('libraries').select('*').order('name', { ascending: true });
             if (error) {
@@ -141,7 +151,6 @@
             render(allLibraries);
         }
 
-        // --- 描画ロジック ---
         function render(libs) {
             const container = document.getElementById('library-container');
             const countEl = document.getElementById('result-count');
@@ -178,7 +187,6 @@
             });
         }
 
-        // --- 検索 ---
         document.getElementById('search-input').addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase();
             const filtered = allLibraries.filter(l => 
@@ -188,7 +196,6 @@
             render(filtered);
         });
 
-        // --- A-Z フィルター ---
         function filterByLetter(char) {
             const filtered = allLibraries.filter(l => l.name.toUpperCase().startsWith(char));
             render(filtered);

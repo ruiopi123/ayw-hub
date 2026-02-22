@@ -7,125 +7,156 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
-    
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: { ayw: '#00f2ff' },
-                    fontFamily: { sans: ['Inter', 'Noto Sans JP', 'sans-serif'] }
-                }
-            }
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    colors: { ayw: '#00f2ff' }, 
+                    fontFamily: { sans: ['Inter', 'Noto Sans JP', 'sans-serif'] } 
+                } 
+            } 
         }
     </script>
     <style>
-        body { background-color: #f9fafb; font-family: 'Inter', 'Noto Sans JP', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); }
-        .auth-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .input-focus:focus { ring: 4px rgba(0, 242, 255, 0.15); border-color: #00f2ff; }
+        .social-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .social-btn:hover { transform: translateY(-2px); }
+        body { background-color: #f8fafc; }
     </style>
 </head>
 <body class="text-slate-900 antialiased min-h-screen flex flex-col">
 
-    <header class="glass border-b border-slate-100 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-lg shadow-slate-200">
-                    <span class="text-ayw font-black text-sm">A</span>
-                </div>
-                <a href="index.html" class="font-black tracking-tighter text-xl">Ayw-Hub<span class="text-slate-300 font-light ml-0.5">.space</span></a>
-            </div>
-        </div>
-    </header>
-
     <main class="flex-grow flex items-center justify-center px-6 py-12">
-        <div class="auth-card w-full max-w-md bg-white border border-slate-100 rounded-[2.5rem] shadow-2xl p-10">
+        <div class="w-full max-w-[440px]">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-black tracking-tight mb-2">Welcome Back</h2>
-                <p class="text-slate-400 text-sm font-medium">パッケージの管理を始めましょう</p>
+                <a href="index.html" class="inline-flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-xl shadow-slate-200 group-hover:scale-110 transition-transform">
+                        <span class="text-ayw font-black text-lg">A</span>
+                    </div>
+                    <span class="font-black text-2xl tracking-tighter italic">Ayw-Hub</span>
+                </a>
+                <p class="mt-4 text-slate-400 font-bold text-[10px] tracking-[0.3em] uppercase">Connect to the ecosystem</p>
             </div>
 
-            <div class="flex p-1 bg-slate-100 rounded-2xl mb-8">
-                <button id="tab-login" onclick="switchTab('login')" class="flex-1 py-2 text-sm font-bold rounded-xl transition-all bg-white shadow-sm text-slate-900">ログイン</button>
-                <button id="tab-signup" onclick="switchTab('signup')" class="flex-1 py-2 text-sm font-bold rounded-xl transition-all text-slate-400 hover:text-slate-600">新規登録</button>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-1">Email Address</label>
-                    <input type="email" id="email" placeholder="you@example.com" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none transition-all input-focus">
+            <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 border border-slate-100 p-8 md:p-10">
+                
+                <div class="space-y-4 mb-8">
+                    <div class="relative">
+                        <input type="email" id="email" placeholder="Email address" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-ayw/20 focus:border-ayw transition-all font-bold placeholder:text-slate-300">
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="password" placeholder="Password" class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:outline-none focus:ring-4 focus:ring-ayw/20 focus:border-ayw transition-all font-bold placeholder:text-slate-300">
+                    </div>
+                    <button onclick="handleEmailAuth()" id="auth-button" class="w-full py-4 bg-slate-900 text-ayw font-black rounded-2xl shadow-lg shadow-slate-200 hover:bg-slate-800 active:scale-[0.98] transition-all uppercase tracking-widest text-sm">
+                        Sign In / Up
+                    </button>
+                    <p id="msg" class="text-[10px] text-center font-bold text-slate-400 min-h-[15px]"></p>
                 </div>
-                <div>
-                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4 mb-1">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none transition-all input-focus">
+
+                <div class="relative flex items-center gap-4 mb-8">
+                    <div class="flex-grow h-px bg-slate-100"></div>
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-[0.2em]">Social Login</span>
+                    <div class="flex-grow h-px bg-slate-100"></div>
                 </div>
 
-                <div id="msg-box" class="text-xs font-bold text-center py-2 hidden"></div>
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <button onclick="loginWith('google')" class="social-btn flex items-center justify-center py-4 border border-slate-100 rounded-2xl hover:bg-slate-50 hover:border-slate-200 shadow-sm">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="w-6 h-6" alt="Google">
+                    </button>
+                    <button onclick="loginWith('github')" class="social-btn flex items-center justify-center py-4 border border-slate-100 rounded-2xl hover:bg-slate-50 hover:border-slate-200 shadow-sm text-slate-900">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </button>
+                    <button onclick="loginWith('twitter')" class="social-btn flex items-center justify-center py-4 border border-slate-100 rounded-2xl hover:bg-slate-50 hover:border-slate-200 shadow-sm text-slate-900">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/></svg>
+                    </button>
+                </div>
 
-                <button id="submit-btn" onclick="handleSubmit()" class="w-full py-5 bg-slate-900 text-ayw font-black rounded-2xl shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4">
-                    ログインする
-                </button>
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 opacity-50 hover:opacity-100 transition-opacity">
+                    <button onclick="loginWith('discord')" class="text-[10px] font-black text-slate-400 hover:text-slate-900 transition uppercase tracking-widest">Discord</button>
+                    <button onclick="loginWith('notion')" class="text-[10px] font-black text-slate-400 hover:text-slate-900 transition uppercase tracking-widest">Notion</button>
+                    <button onclick="loginWith('slack')" class="text-[10px] font-black text-slate-400 hover:text-slate-900 transition uppercase tracking-widest">Slack</button>
+                </div>
             </div>
 
-            <div class="mt-8 text-center">
-                <a href="index.html" class="text-xs font-bold text-slate-300 hover:text-slate-400 transition italic">← Back to Explore</a>
-            </div>
+            <p class="mt-8 text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] leading-relaxed">
+                By signing in, you agree to our <br>
+                <a href="#" class="text-slate-900 underline decoration-ayw decoration-2 underline-offset-4">Terms of Service</a>
+            </p>
         </div>
     </main>
 
+    <footer class="py-8 text-center text-slate-300 text-[10px] font-black uppercase tracking-[0.4em]">
+        Ayw-Hub / Authentication System
+    </footer>
+
     <script>
-        // --- 設定 (Supabase) ---
+        // --- Supabase 設定 ---
         const SUPABASE_URL = 'https://akjkmhudptpkdkfrkmzl.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFramttaHVkcHRwa2RrZnJrbXpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzI4NDcsImV4cCI6MjA4NzI0ODg0N30.Ne78IRYI2hwike1tZu4mS73hJh5R6waYDGM7FgLexyE';
         const { createClient } = supabase;
         const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentMode = 'login';
+        const msgTag = document.getElementById('msg');
 
-        function switchTab(mode) {
-            currentMode = mode;
-            const isLogin = mode === 'login';
-            
-            // UI Switch
-            document.getElementById('tab-login').className = isLogin ? "flex-1 py-2 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2 text-sm font-bold rounded-xl text-slate-400 hover:text-slate-600";
-            document.getElementById('tab-signup').className = !isLogin ? "flex-1 py-2 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2 text-sm font-bold rounded-xl text-slate-400 hover:text-slate-600";
-            document.getElementById('submit-btn').textContent = isLogin ? "ログインする" : "アカウントを作成";
-            document.querySelector('h2').textContent = isLogin ? "Welcome Back" : "Join Ayw-Hub";
-        }
-
-        async function handleSubmit() {
+        // --- メールログイン & 新規登録 ---
+        async function handleEmailAuth() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const msgBox = document.getElementById('msg-box');
-            const btn = document.getElementById('submit-btn');
+            const btn = document.getElementById('auth-button');
 
-            if (!email || !password) return alert("入力してください");
+            if(!email || !password) {
+                msgTag.innerText = "Please fill in all fields.";
+                return;
+            }
 
+            btn.innerText = "Processing...";
             btn.disabled = true;
-            btn.opacity = "0.5";
-            msgBox.classList.remove('hidden');
-            msgBox.className = "text-xs font-bold text-center py-2 text-slate-400 animate-pulse";
-            msgBox.textContent = "処理中...";
 
-            try {
-                if (currentMode === 'login') {
-                    const { error } = await db.auth.signInWithPassword({ email, password });
-                    if (error) throw error;
-                    location.href = 'index.html';
+            // 1. まずログインを試みる
+            const { data, error: loginError } = await db.auth.signInWithPassword({ email, password });
+
+            if (loginError) {
+                // 2. ログインに失敗（ユーザーが存在しない等）なら新規登録を試みる
+                const { error: signUpError } = await db.auth.signUp({ email, password });
+                
+                if (signUpError) {
+                    msgTag.innerText = "Error: " + signUpError.message;
+                    btn.innerText = "Sign In / Up";
+                    btn.disabled = false;
                 } else {
-                    const { error } = await db.auth.signUp({ email, password });
-                    if (error) throw error;
-                    msgBox.className = "text-xs font-bold text-center py-2 text-green-500";
-                    msgBox.textContent = "確認メールを送信しました。チェックしてください！";
+                    msgTag.innerText = "Check your email for the confirmation link!";
+                    btn.innerText = "Email Sent";
                 }
-            } catch (err) {
-                msgBox.className = "text-xs font-bold text-center py-2 text-red-400";
-                msgBox.textContent = "Error: " + err.message;
-            } finally {
-                btn.disabled = false;
-                btn.opacity = "1";
+            } else {
+                // ログイン成功
+                location.href = 'index.html';
             }
         }
+
+        // --- SNSログイン (Google, GitHub, X, etc.) ---
+        async function loginWith(provider) {
+            msgTag.innerText = `Connecting to ${provider}...`;
+            
+            const { error } = await db.auth.signInWithOAuth({
+                provider: provider,
+                options: {
+                    // ログイン後に戻るURL（自分の環境に合わせて自動取得）
+                    redirectTo: window.location.origin + window.location.pathname.replace('login.html', 'index.html')
+                }
+            });
+
+            if (error) {
+                msgTag.innerText = "Auth Error: " + error.message;
+            }
+        }
+
+        // すでにログイン済みならホームへ飛ばす
+        async function checkSession() {
+            const { data } = await db.auth.getSession();
+            if (data.session) {
+                location.href = 'index.html';
+            }
+        }
+        checkSession();
     </script>
 </body>
 </html>

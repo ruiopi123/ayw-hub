@@ -45,6 +45,7 @@
                     <input type="text" id="name" required pattern="^[a-z0-9-]+$" 
                         class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-ayw/10 focus:border-ayw outline-none transition-all font-mono font-bold"
                         placeholder="example-lib">
+                    <p class="text-[10px] text-slate-400 mt-2 ml-1">※世界で唯一の名前である必要があります</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -91,10 +92,8 @@
         async function checkAuth() {
             const { data: { user } } = await db.auth.getUser();
             if (!user) {
-                // ログインしていない場合はログイン画面へ
                 location.href = 'login.html';
             } else {
-                // ログインしていればコンテンツを表示
                 document.getElementById('main-content').classList.remove('hidden-until-auth');
             }
         }
@@ -124,13 +123,31 @@
             if (!user) return alert("セッションが切れました。再ログインしてください。");
 
             btn.disabled = true;
-            btn.textContent = 'Uploading...';
+            btn.textContent = 'Checking & Uploading...';
             msg.className = 'mt-8 text-center text-sm font-bold block text-slate-500 animate-pulse';
-            msg.textContent = 'セキュアな転送を開始中...';
+            msg.textContent = 'パッケージ名を検証中...';
 
             try {
                 const libName = document.getElementById('name').value.toLowerCase();
-                const filePath = `${user.id}/${libName}-${Date.now()}.zip`; // ユーザーIDをパスに含めて整理
+
+                // 🌟 【新規追加】名前の重複チェック機能 🌟
+                // データベースに同じ名前のライブラリが既に存在するか確認する
+                const { data: existingLibs, error: checkError } = await db
+                    .from('libraries')
+                    .select('name')
+                    .eq('name', libName);
+
+                if (checkError) throw checkError;
+
+                // もし1件でも見つかったらエラーを投げてストップさせる
+                if (existingLibs.length > 0) {
+                    throw new Error(`パッケージ名 "${libName}" は既に使用されています。別の名前を指定してください。`);
+                }
+
+                msg.textContent = 'セキュアな転送を開始中...';
+
+                // --- 以降は元のアップロード処理 ---
+                const filePath = `${user.id}/${libName}-${Date.now()}.zip`;
 
                 // 1. Storageにアップロード
                 const { data: uploadData, error: uploadError } = await db.storage
@@ -143,14 +160,14 @@
                 const { data: urlData } = db.storage.from('packages').getPublicUrl(filePath);
                 const publicUrl = urlData.publicUrl;
 
-                // 3. データベースに情報を登録（user_idを追加！）
+                // 3. データベースに情報を登録
                 const { error: dbError } = await db.from('libraries').insert([{
                     name: libName,
                     version: document.getElementById('version').value,
                     author: document.getElementById('author').value,
                     download_url: publicUrl,
                     description: document.getElementById('desc').value,
-                    user_id: user.id // ここがポイント！
+                    user_id: user.id
                 }]);
 
                 if (dbError) throw dbError;
@@ -161,6 +178,7 @@
                 document.getElementById('file-label').innerHTML = 'ここにZIPファイルをドラッグ＆ドロップ';
                 
             } catch (err) {
+                // エラー時（名前被りなど）の表示
                 msg.textContent = 'エラー: ' + err.message;
                 msg.className = 'mt-8 text-center text-sm font-bold block text-red-500';
             } finally {

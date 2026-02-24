@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aywsion OS - 仕組みと教育的価値 (ドキュメント)</title>
+    <style>
+        /* 全体のベーススタイル */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ヘッダーのナビゲーション（他のページと統一感を出す部分） */
+        header {
+            background: #1a1a2e;
+            color: #ffffff;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0f3460;
+            background: #e94560;
+            padding: 0.2rem 0.8rem;
+            border-radius: 4px;
+        }
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #e94560;
+        }
+
+        /* メインコンテンツ領域 */
+        .container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #1a1a2e;
+            font-size: 2.2rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: #0f3460;
+            border-bottom: 3px solid #e94560;
+            padding-bottom: 0.5rem;
+            margin-top: 3rem;
+            font-size: 1.6rem;
+        }
+
+        h3 {
+            color: #1a1a2e;
+            margin-top: 2rem;
+            font-size: 1.3rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        /* 教育的アピール用のハイライトボックス */
+        .edu-box {
+            background: #e8f4fd;
+            border-left: 5px solid #0f3460;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .edu-box h4 {
+            margin-top: 0;
+            color: #0f3460;
+        }
+
+        ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* 次のページへのボタン */
+        .next-btn-container {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+        .next-btn {
+            display: inline-block;
+            background: #e94560;
+            color: #ffffff;
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        /* フッター */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Aywsion OS</div>
+        <nav>
+            <a href="index.html">ホーム</a>
+            <a href="explanation.html" style="color: #e94560; font-weight: bold;">Aywsionとは？</a>
+            <a href="explanation_lib.html">ライブラリ開発</a>
+            <a href="explanation_code.html">コードの書き方</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Aywsion とは？</h1>
+        <div class="subtitle">次世代の学習用プログラミング言語・論理エンジンアーキテクチャ</div>
+
+        <div class="edu-box">
+            <h4>💡 学習機関・教育関係者の方へ</h4>
+            <p>本プロジェクト「Aywsion（アイウィジョン）」は、学生やプログラミング初心者が<strong>「コンピュータがどのように言葉（コード）を理解し、実行するのか」</strong>というインタプリタの仕組みや、OSの基礎概念を安全に学ぶために開発されたプロジェクトです。最新の安全な言語であるRustを用いて構築されており、情報技術（IT）の基礎教育に貢献することを目的としています。</p>
+        </div>
+
+        <h2>1. プロジェクトの概要</h2>
+        <p>Aywsionは、単なるプログラミング言語ではなく、<strong>「コマンドライン上で動作する軽量な論理エンジン（シェル兼インタプリタ）」</strong>として設計されています。</p>
+        <p>既存の複雑なプログラミング言語（C++やJavaなど）を学ぶ前に、変数の宣言、条件分岐、ループ処理、そして外部ライブラリのインポートといった「プログラミング的思考」の根幹を、非常にシンプルで直感的な構文で体験することができます。</p>
+
+        <h2>2. なぜAywsionが学習に最適なのか？（教育的メリット）</h2>
+        <p>現代の情報教育において、プログラミング言語の文法を丸暗記するだけでなく、「システムが裏側でどう動いているか」を想像する力が求められています。Aywsionは以下の点で優れた学習効果を発揮します。</p>
+        
+        <ul>
+            <li><strong>シンプルな構文による論理的思考の育成:</strong> Pythonのようにインデントに縛られず、明示的なキーワード（<code>let</code>, <code>if</code>, <code>fn</code>）を用いることで、「どこからどこまでがひとつの処理か」を視覚的に理解しやすくなっています。</li>
+            <li><strong>パッケージエコシステムの体験:</strong> <code>ayw install</code> コマンドを通じて、世界中のコード（ライブラリ）を自分の環境に取り込むという、現代のソフトウェア開発に不可欠な「パッケージ管理」の概念を安全に体験できます。</li>
+            <li><strong>データベース機能の標準搭載:</strong> 初学者がつまづきやすい「データの永続化（保存）」を、言語の標準機能（<code>db_save</code>, <code>db_load</code>）として提供することで、データ駆動型のアプリケーション設計を容易に学べます。</li>
+        </ul>
+
+        <h2>3. 内部アーキテクチャ（Rustによる堅牢な設計）</h2>
+        <p>Aywsionのコアエンジンは、メモリ安全性が高く、世界中で急速に採用が進んでいるシステムプログラミング言語「Rust」で書かれています。</p>
+        <h3>字句解析と評価ループ (The Brain)</h3>
+        <p>入力されたスクリプトは一行ずつ読み込まれ、内部の <code>Runtime</code> 構造体によって解釈されます。変数は <code>HashMap</code> によってメモリ上に管理され、スコープ（変数の有効範囲）の概念をシミュレートします。</p>
+        <h3>JSONベースのデータストア</h3>
+        <p>複雑なSQL構文を学ぶ前に、NoSQL型のキー・バリュー（KVS）データ保存を体験できるよう、軽量なJSON形式を用いたローカルデータベースシステムを採用しています。これにより、生徒はデータの構造化（ArrayやStringの扱い）を直感的に学習できます。</p>
+
+        <h2>4. セキュリティと安全性</h2>
+        <p>Aywsionは学習環境としての安全性を最優先しています。外部通信は公式のパッケージリポジトリ（Supabaseを利用したAyw-Hub）へのアクセスのみに制限されており、悪意のあるコードの実行を防ぐためのサンドボックス的な設計思想を取り入れています。これにより、学校のネットワーク環境でも安心して利用可能です。</p>
+
+        <div class="next-btn-container">
+            <p>Aywsionの全体像が掴めたら、次は「自分だけの機能を追加する方法」を学びましょう！</p>
+            <a href="explanation_lib.html" class="next-btn">次のページ：ライブラリの作り方へ ➔</a>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Aywsion OS Project. All rights reserved. <br>
+        Empowering the next generation of computer scientists.
+    </footer>
+
+</body>
+</html>
